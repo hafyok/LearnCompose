@@ -9,6 +9,8 @@ import androidx.compose.foundation.*
 import androidx.compose.foundation.gestures.detectDragGesturesAfterLongPress
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
@@ -35,34 +37,23 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            Box(modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center){
-                CircleItem()
+            LazyColumn (
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier
+                    .fillMaxSize()
+            ){
+                itemsIndexed(
+                    listOf("item 1", "Item 2", "End", "Finish")
+                ){_, item ->
+                    Text(
+                        text = item,
+                        fontSize = 30.sp,
+                        modifier = Modifier.padding(vertical = 10.dp)
+                    )
+                }
             }
         }
     }
 }
-
-@Composable
-private fun CircleItem(){
-    var counter = remember {
-        mutableStateOf(0)
-    }
-    var color = remember {
-        mutableStateOf(Color.Blue)
-    }
-    Box(modifier = Modifier
-        .size(100.dp)
-        .clickable {
-            when(++counter.value){
-                5 -> color.value = Color.Red
-                10 -> color.value = Color.Green
-                15 -> color.value = Color.DarkGray
-            }
-        }
-        .background(color = color.value, shape = CircleShape),
-        contentAlignment = Alignment.Center){
-            Text(text = counter.value.toString(),
-                style = TextStyle(color = Color.White, fontSize = 20.sp))
-    }
-}
+//LazyColumn и LazyRow намного удобнее RecycleView в XML. Если раньше приходилось создавать
+//целые классы кода для отображения списка, то в Compose все решается чуть ли не пару строк
