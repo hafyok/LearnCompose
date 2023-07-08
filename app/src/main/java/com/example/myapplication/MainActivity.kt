@@ -16,6 +16,8 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -23,64 +25,44 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.example.myapplication.ui.theme.MyApplicationTheme
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            Column(modifier = Modifier.verticalScroll(rememberScrollState())){
-                ListItem(name = "Saitama", prof = "Hero")
-                ListItem(name = "Genos", prof = "Hero")
-                ListItem(name = "Bang", prof = "Hero")
-                ListItem(name = "Boros", prof = "Alien")
-                ListItem(name = "Tatsumaki", prof = "Hero")
-                ListItem(name = "Sonic", prof = "Killer")
-                ListItem(name = "Saitama", prof = "Hero")
-                ListItem(name = "Saitama", prof = "Hero")
-                ListItem(name = "Saitama", prof = "Hero")
-                ListItem(name = "Saitama", prof = "Hero")
-                ListItem(name = "Saitama", prof = "Hero")
-                ListItem(name = "Saitama", prof = "Hero")
-                ListItem(name = "Saitama", prof = "Hero")
-                ListItem(name = "Saitama", prof = "Hero")
+            Box(modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center){
+                CircleItem()
             }
         }
     }
 }
 
 @Composable
-private fun ListItem(name: String, prof: String){
-    Card(
-        modifier = Modifier
-            .padding(10.dp)
-            .fillMaxWidth()
-            .pointerInput(Unit) {
-              detectHorizontalDragGestures { change, dragAmount ->
-                  Log.d("MyLog", "Long press $dragAmount")
-              }
-            },
-        shape = RoundedCornerShape(15.dp),
-        elevation = 5.dp
-    ){
-        Box(){
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Image(
-                    painter = painterResource(id = R.drawable.saitama),
-                    contentDescription = "text",
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier
-                        .padding(10.dp)
-                        .size(64.dp)
-                        .clip(CircleShape)
-                )
-                Column(modifier = Modifier.padding(start = 16.dp)) {
-                    Text(text = name)
-                    Text(text = prof)
-                }
+private fun CircleItem(){
+    var counter = remember {
+        mutableStateOf(0)
+    }
+    var color = remember {
+        mutableStateOf(Color.Blue)
+    }
+    Box(modifier = Modifier
+        .size(100.dp)
+        .clickable {
+            when(++counter.value){
+                5 -> color.value = Color.Red
+                10 -> color.value = Color.Green
+                15 -> color.value = Color.DarkGray
             }
         }
+        .background(color = color.value, shape = CircleShape),
+        contentAlignment = Alignment.Center){
+            Text(text = counter.value.toString(),
+                style = TextStyle(color = Color.White, fontSize = 20.sp))
     }
 }
