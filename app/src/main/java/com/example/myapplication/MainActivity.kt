@@ -1,91 +1,89 @@
 package com.example.myapplication
 
+import android.content.Context
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.material.Button
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Surface
+import androidx.compose.material.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.dp
+import com.android.volley.Request
+import com.android.volley.toolbox.StringRequest
+import com.android.volley.toolbox.Volley
+import com.example.myapplication.ui.theme.MyApplicationTheme
+import org.json.JSONObject
 
+const val API_KEY = "dccb43f4250740a0901150758231007"
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            LazyColumn (
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(Color.Gray)
-            ){
-                itemsIndexed(
-                    listOf(
-                        ItemRowModel(R.drawable.saitama, "Saitama", "On the other hand, "+
-                                "we denounce with righteous indignation and dislike men who are so "+
-                                "beguiled and demoralized by the charms of pleasure of the moment, so"+
-                                "blinded by desire, that they cannot foresee the pain and trouble that"+
-                                " are bound to ensue; and equal blame belongs to those who fail in their"+
-                                "duty through weakness of will, which is the same as saying through "+
-                                "shrinking from toil and pain. These cases are perfectly simple and easy"+
-                                "to distinguish. In a free hour, when our power of choice is untrammelled"+
-                                " and when nothing prevents our being able to do what we like best, every"+
-                                " pleasure is to be welcomed and every pain avoided."),
-                        ItemRowModel(R.drawable.genos, "Genos", "On the other hand, "+
-                            "we denounce with righteous indignation and dislike men who are so "+
-                                    "beguiled and demoralized by the charms of pleasure of the moment, so"+
-                                    "blinded by desire, that they cannot foresee the pain and trouble that"+
-                                    " are bound to ensue; and equal blame belongs to those who fail in their"+
-                                    "duty through weakness of will, which is the same as saying through "+
-                                    "shrinking from toil and pain. These cases are perfectly simple and easy"+
-                                    "to distinguish. In a free hour, when our power of choice is untrammelled"+
-                                    " and when nothing prevents our being able to do what we like best, every"+
-                                    " pleasure is to be welcomed and every pain avoided."),
-                        ItemRowModel(R.drawable.bang, "Bang", "On the other hand, "+
-                                "we denounce with righteous indignation and dislike men who are so "+
-                                "beguiled and demoralized by the charms of pleasure of the moment, so"+
-                                "blinded by desire, that they cannot foresee the pain and trouble that"+
-                                " are bound to ensue; and equal blame belongs to those who fail in their"+
-                                "duty through weakness of will, which is the same as saying through "+
-                                "shrinking from toil and pain. These cases are perfectly simple and easy"+
-                                "to distinguish. In a free hour, when our power of choice is untrammelled"+
-                                " and when nothing prevents our being able to do what we like best, every"+
-                                " pleasure is to be welcomed and every pain avoided."),
-                        ItemRowModel(R.drawable.sonic, "Sonic", "On the other hand, "+
-                                "we denounce with righteous indignation and dislike men who are so "+
-                                "beguiled and demoralized by the charms of pleasure of the moment, so"+
-                                "blinded by desire, that they cannot foresee the pain and trouble that"+
-                                " are bound to ensue; and equal blame belongs to those who fail in their"+
-                                "duty through weakness of will, which is the same as saying through "+
-                                "shrinking from toil and pain. These cases are perfectly simple and easy"+
-                                "to distinguish. In a free hour, when our power of choice is untrammelled"+
-                                " and when nothing prevents our being able to do what we like best, every"+
-                                " pleasure is to be welcomed and every pain avoided."),
-                        ItemRowModel(R.drawable.king, "King", "On the other hand, "+
-                                "we denounce with righteous indignation and dislike men who are so "+
-                                "beguiled and demoralized by the charms of pleasure of the moment, so"+
-                                "blinded by desire, that they cannot foresee the pain and trouble that"+
-                                " are bound to ensue; and equal blame belongs to those who fail in their"+
-                                "duty through weakness of will, which is the same as saying through "+
-                                "shrinking from toil and pain. These cases are perfectly simple and easy"+
-                                "to distinguish. In a free hour, when our power of choice is untrammelled"+
-                                " and when nothing prevents our being able to do what we like best, every"+
-                                " pleasure is to be welcomed and every pain avoided."),
-                        ItemRowModel(R.drawable.garou, "Garou", "On the other hand, "+
-                                "we denounce with righteous indignation and dislike men who are so "+
-                                "beguiled and demoralized by the charms of pleasure of the moment, so"+
-                                "blinded by desire, that they cannot foresee the pain and trouble that"+
-                                " are bound to ensue; and equal blame belongs to those who fail in their"+
-                                "duty through weakness of will, which is the same as saying through "+
-                                "shrinking from toil and pain. These cases are perfectly simple and easy"+
-                                "to distinguish. In a free hour, when our power of choice is untrammelled"+
-                                " and when nothing prevents our being able to do what we like best, every"+
-                                " pleasure is to be welcomed and every pain avoided."),
-                        )
-                ){_, item ->
-                    ItemRow(item = item)
+            MyApplicationTheme {
+                Surface(
+                    modifier = Modifier.fillMaxSize(),
+                    color = MaterialTheme.colors.background
+                ){
+                    Greeting(name = "Moscow", this)
                 }
             }
         }
     }
+}
+
+@Composable
+fun Greeting(name: String, context: Context){
+    val state = remember{
+        mutableStateOf("Unknown")
+    }
+    Column(modifier = Modifier.fillMaxSize()){
+        Box(modifier = Modifier.fillMaxHeight(0.5f)
+            .fillMaxWidth(),
+            contentAlignment = Alignment.Center
+        ){
+            Text(text = "Temp in $name = ${state.value} C")
+        }
+        Box(modifier = Modifier.fillMaxHeight()
+            .fillMaxWidth(),
+            contentAlignment = Alignment.BottomCenter
+        ){
+            Button(onClick = {
+                getResult(name, state, context)
+            }, modifier = Modifier.padding(5.dp)
+                .fillMaxWidth()) {
+                Text(text = "Refresh")
+            }
+        }
+    }
+}
+
+private fun getResult(city: String, state: MutableState<String>, context: Context){
+    val url = "https://api.weatherapi.com/v1/current.json" +
+            "?key=$API_KEY&" +
+            "q=$city" +
+            "&aqi=no"
+    val queue = Volley.newRequestQueue(context)
+    val stringRequest = StringRequest(
+        Request.Method.GET,
+        url,
+        {
+            response ->
+            val obj = JSONObject(response)
+            state.value = obj.getJSONObject("current").getString("temp_c")
+        },
+        {
+            error ->
+            Log.d("MyLog", "Error $error")
+        }
+    )
+    queue.add(stringRequest)
 }
